@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carteira de Aluguéis</title>
+<style>
+  :root{
+    --ink:#1b2620;        /* verde quase preto */
+    --ink-soft:#3c4a42;
+    --paper:#f3f1e9;      /* papel envelhecido */
+    --paper-2:#e9e6db;
+    --line:#cdc8b8;
+    --green:#1f6b4a;      /* verde carteira */
+    --green-d:#154d35;
+    --gold:#a9802f;       /* selo */
+    --red:#9a3b32;
+    --blue:#2d5570;
+    --white:#fbfaf5;
+    --shadow:0 1px 0 rgba(0,0,0,.04), 0 8px 24px rgba(27,38,32,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+  /* ---------- Cabeçalho ---------- */
+  header.top{
+    background:var(--green-d);
+    color:var(--white);
+    padding:22px 24px 16px;
+    border-bottom:3px solid var(--gold);
+  }
+  .top-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;max-width:1180px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:14px}
+  .seal{
+    width:46px;height:46px;border-radius:50%;
+    border:2px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;flex:0 0 auto;background:rgba(169,128,47,.12);
+  }
+  h1{font-size:21px;margin:0;letter-spacing:.5px;font-weight:600}
+  .sub{font-size:12px;opacity:.7;margin-top:2px;letter-spacing:.3px}
+  .status{font-size:12px;opacity:.85;text-align:right}
+  .status b{color:var(--gold)}
+
+  /* ---------- Abas ---------- */
+  nav.tabs{
+    background:var(--green);
+    display:flex;gap:0;padding:0 24px;flex-wrap:wrap;
+    box-shadow:var(--shadow);position:sticky;top:0;z-index:20;
+  }
+  .tabs-inner{display:flex;max-width:1180px;margin:0 auto;width:100%;flex-wrap:wrap}
+  nav.tabs button{
+    background:transparent;border:none;color:rgba(255,255,255,.75);
+    padding:13px 20px;font-size:14px;cursor:pointer;font-weight:500;
+    border-bottom:3px solid transparent;letter-spacing:.3px;
+  }
+  nav.tabs button .badge{
+    display:inline-block;min-width:20px;padding:1px 6px;margin-left:7px;
+    background:rgba(0,0,0,.22);border-radius:10px;font-size:11px;
+  }
+  nav.tabs button:hover{color:#fff;background:rgba(0,0,0,.08)}
+  nav.tabs button.active{color:#fff;border-bottom-color:var(--gold);background:rgba(0,0,0,.12)}
+
+  main{max-width:1180px;margin:0 auto;padding:22px 24px 60px}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* ---------- Cartões resumo ---------- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+  .card{
+    background:var(--white);border:1px solid var(--line);border-radius:10px;
+    padding:16px 18px;box-shadow:var(--shadow);
+  }
+  .card .k{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-soft);opacity:.8}
+  .card .v{font-size:25px;font-weight:700;margin-top:6px}
+  .card.green .v{color:var(--green)}
+  .card.gold .v{color:var(--gold)}
+  .card.red .v{color:var(--red)}
+
+  /* ---------- Formulário ---------- */
+  .form-card{
+    background:var(--white);border:1px solid var(--line);border-radius:10px;
+    padding:20px 22px;box-shadow:var(--shadow);margin-bottom:22px;
+  }
+  .form-card h2{margin:0 0 4px;font-size:16px;color:var(--green-d)}
+  .form-card .hint{font-size:12px;color:var(--ink-soft);margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field.wide{grid-column:1/-1}
+  label{font-size:12px;font-weight:600;color:var(--ink-soft);letter-spacing:.2px}
+  input,select,textarea{
+    font-family:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--line);
+    border-radius:7px;background:var(--paper);color:var(--ink);width:100%;
+  }
+  textarea{resize:vertical;min-height:42px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--green);outline-offset:0;background:#fff}
+  .form-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+
+  button.btn{
+    font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;
+    padding:10px 18px;border-radius:7px;border:1px solid transparent;letter-spacing:.3px;
+  }
+  .btn.primary{background:var(--green);color:#fff}
+  .btn.primary:hover{background:var(--green-d)}
+  .btn.ghost{background:transparent;color:var(--ink-soft);border-color:var(--line)}
+  .btn.ghost:hover{background:var(--paper-2)}
+  .btn.small{padding:6px 12px;font-size:12.5px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* ---------- Filtros ---------- */
+  .filters{
+    background:var(--white);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;box-shadow:var(--shadow);margin-bottom:18px;
+    display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;
+  }
+  .filters .field{min-width:150px;flex:1}
+  .filters .field.compact{flex:0 0 auto;min-width:130px}
+
+  /* ---------- Tabela ---------- */
+  .table-wrap{background:var(--white);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+  .table-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:760px}
+  thead th{
+    background:var(--paper-2);text-align:left;padding:11px 12px;font-size:11px;
+    text-transform:uppercase;letter-spacing:.6px;color:var(--ink-soft);
+    border-bottom:2px solid var(--line);white-space:nowrap;
+  }
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--paper-2);vertical-align:top}
+  tbody tr:hover{background:#faf9f2}
+  td.valor{font-weight:700;color:var(--green-d)}
+  .imovel-cell b{display:block}
+  .imovel-cell span{font-size:11.5px;color:var(--ink-soft)}
+  .obs-cell{max-width:230px;font-size:12.5px;color:var(--ink-soft);white-space:pre-wrap}
+  .conta-pill{
+    display:inline-block;font-size:11.5px;background:var(--paper-2);
+    border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--ink-soft);
+  }
+  .venc-late{color:var(--red);font-weight:600}
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+  .check-btn{
+    cursor:pointer;border:1.5px solid var(--green);background:#fff;color:var(--green);
+    width:30px;height:30px;border-radius:7px;font-size:15px;font-weight:700;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .check-btn:hover{background:var(--green);color:#fff}
+  .check-btn.done{background:var(--green);color:#fff;border-color:var(--green)}
+
+  .icon-btn{
+    cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:6px;
+    width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;
+  }
+  .icon-btn:hover{background:var(--paper-2)}
+  .icon-btn.danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
+
+  tfoot td{padding:13px 12px;border-top:2px solid var(--line);font-weight:700;background:var(--paper-2)}
+  tfoot .total-val{font-size:17px;color:var(--green-d)}
+
+  .empty{padding:40px 20px;text-align:center;color:var(--ink-soft)}
+  .empty .big{font-size:30px;margin-bottom:8px}
+
+  .export-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .export-lbl{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-right:2px}
+
+  .form-sep{margin:22px 0 14px;font-size:12px;text-transform:uppercase;letter-spacing:1px;
+    color:var(--green-d);font-weight:700;border-top:1px solid var(--line);padding-top:16px}
+  .anexo-box{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+  .anexo-atual{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13.5px;margin-bottom:10px;
+    background:#e8f3ec;border:1px solid var(--green);border-radius:7px;padding:8px 12px}
+  .anexo-atual a{color:var(--green-d);font-weight:600}
+  .anexo-novo{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .anexo-novo input[type=file]{font-size:13px;max-width:100%}
+  .anexo-hint{font-size:12px;color:var(--ink-soft)}
+  .anexo-status{font-size:13px;margin-top:10px;color:var(--green-d);font-weight:600}
+  .anexo-status.err{color:var(--red)}
+  .clip-link{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--green-d);font-weight:600;text-decoration:none}
+  .clip-link:hover{text-decoration:underline}
+  .rj-hint{font-size:13px;color:var(--ink-soft);margin:0 0 16px;max-width:760px;line-height:1.5}
+  .rj-banner{background:#fbe9e6;border:1px solid var(--red);border-left:5px solid var(--red);
+    border-radius:10px;padding:13px 16px;margin-bottom:18px;font-size:13.5px;color:#6e241d;cursor:pointer}
+  .rj-banner b{color:var(--red)}
+  .rj-banner:hover{background:#f8ddd9}
+  .pill-alert{display:inline-block;font-size:11.5px;border-radius:6px;padding:2px 8px;font-weight:600}
+  .pill-due{background:#fbe9e6;color:var(--red);border:1px solid var(--red)}
+  .pill-soon{background:#fff5e0;color:#8a6516;border:1px solid var(--gold)}
+  .pill-ok{background:#e8f3ec;color:var(--green);border:1px solid var(--green)}
+
+  /* ---------- Toast / loading ---------- */
+  #toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--ink);color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;
+    box-shadow:0 8px 30px rgba(0,0,0,.3);transition:transform .3s ease;z-index:100;max-width:90%;
+  }
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  #toast.err{background:var(--red)}
+  .loading{display:none;padding:30px;text-align:center;color:var(--ink-soft)}
+  .loading.on{display:block}
+  .spin{display:inline-block;width:20px;height:20px;border:3px solid var(--line);border-top-color:var(--green);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:8px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  /* ---------- Config / aviso ---------- */
+  .config-warn{
+    background:#fff5e0;border:1px solid var(--gold);border-radius:10px;padding:16px 18px;margin-bottom:20px;font-size:13.5px;color:#6b4f17;
+  }
+  .config-warn code{background:#fff;padding:1px 6px;border-radius:4px;border:1px solid var(--line)}
+  .config-warn a{color:var(--green);font-weight:600;text-decoration:underline;cursor:pointer}
+
+  @media(max-width:600px){
+    h1{font-size:18px}
+    main{padding:16px 14px 50px}
+    nav.tabs{padding:0 8px}
+    nav.tabs button{padding:12px 12px;font-size:13px}
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <div class="seal">🏠</div>
+      <div>
+        <h1>Carteira de Aluguéis</h1>
+      </div>
+    </div>
+    <div class="status" id="status">Conectando à planilha…</div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tabs-inner">
+    <button data-tab="conferir" class="active">A conferir <span class="badge" id="badge-conferir">0</span></button>
+    <button data-tab="extrato">Extrato bancário <span class="badge" id="badge-recebidos">0</span></button>
+    <button data-tab="reajustes">Reajustes <span class="badge" id="badge-reajustes">0</span></button>
+    <button data-tab="imoveis">+ Novo lançamento</button>
+  </div>
+</nav>
+
+<main>
+  <!-- aviso de configuração / modo teste -->
+  <div class="config-warn" id="configWarn" style="display:none">
+    🧪 <b>Modo teste ativo.</b> Os lançamentos estão sendo salvos só neste navegador,
+    para você experimentar o sistema. Eles <b>não vão para a planilha</b> ainda e podem
+    se perder se limpar os dados do navegador. Quando estiver pronto, preencha a constante
+    <code>API_URL</code> no arquivo (instruções no <code>LEIA-ME.txt</code>) e tudo passa a
+    salvar na nuvem automaticamente. <a href="#" id="seedBtn">Inserir 3 lançamentos de exemplo</a>.
+  </div>
+
+  <!-- ====== ABA: A CONFERIR ====== -->
+  <section class="panel active" id="tab-conferir">
+    <div class="rj-banner" id="rj-banner" style="display:none"></div>
+    <div class="cards">
+      <div class="card gold"><div class="k">A receber (pendentes)</div><div class="v num" id="c-pend-total">R$ 0</div></div>
+      <div class="card"><div class="k">Lançamentos pendentes</div><div class="v num" id="c-pend-qtd">0</div></div>
+      <div class="card red"><div class="k">Vencidos não recebidos</div><div class="v num" id="c-vencidos">0</div></div>
+    </div>
+    <div class="loading" id="load-conferir"><span class="spin"></span>Carregando…</div>
+    <div class="export-bar">
+      <span class="export-lbl">Exportar “A conferir”:</span>
+      <button class="btn ghost small" id="exp-conferir-xls">📊 Excel</button>
+      <button class="btn ghost small" id="exp-conferir-pdf">📄 PDF</button>
+    </div>
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>OK</th><th>Imóvel / Endereço</th><th>Valor</th><th>Vencimento</th>
+            <th>Conta corrente</th><th>Observações</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="body-conferir"></tbody>
+          <tfoot><tr>
+            <td colspan="2">Total pendente</td>
+            <td class="total-val num" id="foot-conferir">R$ 0,00</td>
+            <td colspan="4"></td>
+          </tr></tfoot>
+        </table>
+      </div>
+      <div class="empty" id="empty-conferir" style="display:none">
+        <div class="big">✓</div>Nenhum aluguel a conferir. Tudo em dia!
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ABA: EXTRATO ====== -->
+  <section class="panel" id="tab-extrato">
+    <div class="filters">
+      <div class="field compact">
+        <label>De (data receb.)</label>
+        <input type="date" id="f-de">
+      </div>
+      <div class="field compact">
+        <label>Até (data receb.)</label>
+        <input type="date" id="f-ate">
+      </div>
+      <div class="field">
+        <label>Imóvel</label>
+        <select id="f-imovel"><option value="">Todos</option></select>
+      </div>
+      <div class="field">
+        <label>Conta corrente</label>
+        <select id="f-conta"><option value="">Todas</option></select>
+      </div>
+      <div class="field compact">
+        <label>Situação</label>
+        <select id="f-situacao">
+          <option value="recebido">Só recebidos</option>
+          <option value="todos">Todos</option>
+          <option value="pendente">Só pendentes</option>
+        </select>
+      </div>
+      <div class="field compact">
+        <label>&nbsp;</label>
+        <button class="btn ghost small" id="f-limpar">Limpar filtros</button>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card green"><div class="k">Total filtrado</div><div class="v num" id="x-total">R$ 0</div></div>
+      <div class="card"><div class="k">Nº de lançamentos</div><div class="v num" id="x-qtd">0</div></div>
+      <div class="card gold"><div class="k">Recebido no mês atual</div><div class="v num" id="x-mes">R$ 0</div></div>
+    </div>
+
+    <div class="export-bar">
+      <span class="export-lbl">Exportar histórico (com os filtros aplicados):</span>
+      <button class="btn ghost small" id="exp-extrato-xls">📊 Excel</button>
+      <button class="btn ghost small" id="exp-extrato-pdf">📄 PDF</button>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Data receb.</th><th>Vencimento</th><th>Valor</th>
+            <th>Imóvel / Endereço</th><th>Conta corrente</th><th>Situação</th><th>Observações</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="body-extrato"></tbody>
+          <tfoot><tr>
+            <td colspan="2">Total dos filtros</td>
+            <td class="total-val num" id="foot-extrato">R$ 0,00</td>
+            <td colspan="5"></td>
+          </tr></tfoot>
+        </table>
+      </div>
+      <div class="empty" id="empty-extrato" style="display:none">
+        <div class="big">🔎</div>Nenhum lançamento para os filtros selecionados.
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ABA: REAJUSTES ====== -->
+  <section class="panel" id="tab-reajustes">
+    <div class="cards">
+      <div class="card red"><div class="k">Reajuste a vencer (≤ 30 dias)</div><div class="v num" id="rj-prox">0</div></div>
+      <div class="card gold"><div class="k">Já passou do aniversário</div><div class="v num" id="rj-venc">0</div></div>
+      <div class="card"><div class="k">Contratos com data cadastrada</div><div class="v num" id="rj-total">0</div></div>
+    </div>
+    <p class="rj-hint">O aviso aparece quando o contrato se aproxima do <b>aniversário anual da assinatura</b> — momento de aplicar o índice de correção e atualizar o valor do aluguel. Contratos sem data de assinatura não entram nesta lista (edite o lançamento para incluir).</p>
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Imóvel / Endereço</th><th>Aluguel atual</th><th>Índice</th>
+            <th>Assinatura</th><th>Próximo aniversário</th><th>Último reajuste</th><th>Situação</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="body-reajustes"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty-reajustes" style="display:none">
+        <div class="big">📅</div>Nenhum contrato com reajuste próximo. Tudo em dia.
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ABA: NOVO LANÇAMENTO ====== -->
+  <section class="panel" id="tab-imoveis">
+    <div class="form-card">
+      <h2 id="form-title">Novo lançamento de aluguel</h2>
+      <div class="hint">Cadastre o imóvel, valor e vencimento. Cada lançamento é gravado em uma linha da planilha.</div>
+      <input type="hidden" id="form-id">
+      <div class="grid">
+        <div class="field">
+          <label for="i-imovel">Imóvel / Inquilino *</label>
+          <input id="i-imovel" placeholder="Ex.: Apto 302 — João Silva">
+        </div>
+        <div class="field wide">
+          <label for="i-endereco">Endereço</label>
+          <input id="i-endereco" placeholder="Rua, número, bairro, cidade">
+        </div>
+        <div class="field">
+          <label for="i-valor">Valor do aluguel (R$) *</label>
+          <input id="i-valor" type="number" step="0.01" min="0" placeholder="0,00">
+        </div>
+        <div class="field">
+          <label for="i-vencimento">Data de vencimento *</label>
+          <input id="i-vencimento" type="date">
+        </div>
+        <div class="field">
+          <label for="i-conta">Conta corrente</label>
+          <input id="i-conta" placeholder="Ex.: Itaú Ag 1234 C/C 56789">
+        </div>
+        <div class="field wide">
+          <label for="i-obs">Observações</label>
+          <textarea id="i-obs" placeholder="Qualquer informação importante deste lançamento…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-sep">Dados do contrato (para controle de reajuste)</div>
+      <div class="grid">
+        <div class="field">
+          <label for="i-assinatura">Data de assinatura do contrato</label>
+          <input id="i-assinatura" type="date">
+        </div>
+        <div class="field">
+          <label for="i-venc-contrato">Vencimento do contrato</label>
+          <input id="i-venc-contrato" type="date">
+        </div>
+        <div class="field">
+          <label for="i-indice">Índice de correção</label>
+          <select id="i-indice">
+            <option value="">— selecione —</option>
+            <option>IGP-M</option>
+            <option>IPCA</option>
+            <option>INPC</option>
+            <option>IGP-DI</option>
+            <option>Outro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-sep">Contrato de locação (arquivo)</div>
+      <div class="anexo-box" id="anexo-box">
+        <div class="anexo-atual" id="anexo-atual" style="display:none">
+          📎 Contrato anexado.
+          <a id="anexo-link" href="#" target="_blank" rel="noopener">Abrir contrato</a>
+          <button type="button" class="btn ghost small" id="anexo-remover">Remover</button>
+        </div>
+        <div class="anexo-novo">
+          <input type="file" id="i-contrato" accept="application/pdf,image/*">
+          <span class="anexo-hint" id="anexo-hint">PDF ou foto (JPG/PNG). Será salvo no seu Google Drive. Máx. ~25 MB.</span>
+        </div>
+        <div class="anexo-status" id="anexo-status" style="display:none"></div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn primary" id="btn-salvar">Salvar lançamento</button>
+        <button class="btn ghost" id="btn-cancelar" style="display:none">Cancelar edição</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+/* ===================================================================
+   CONFIGURAÇÃO — cole aqui a URL do seu Apps Script (App da Web)
+   =================================================================== */
+const API_URL = "https://script.google.com/macros/s/AKfycbzOPO9UQP0GUblq0C17rmN8tKmicLdRyuxTr_rj5MjDFb-29bEUGlM4gZydpa3-_cvS/exec";
+
+/* =================================================================== */
+let DADOS = [];
+let editandoId = null;
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+const BRL = v => (Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const BRLk = v => 'R$ '+(Number(v)||0).toLocaleString('pt-BR',{maximumFractionDigits:0});
+
+function fmtData(s){
+  if(!s) return '—';
+  // aceita yyyy-mm-dd ou ISO
+  const d = String(s).slice(0,10).split('-');
+  if(d.length===3) return d[2]+'/'+d[1]+'/'+d[0];
+  return s;
+}
+function hoje(){ return new Date().toISOString().slice(0,10); }
+function isVencido(venc){
+  if(!venc) return false;
+  return String(venc).slice(0,10) < hoje();
+}
+
+/* ===== Reajuste de contrato ===== */
+const DIAS_AVISO_REAJUSTE = 30; // <<< altere aqui a antecedência do aviso (em dias)
+
+function diasEntre(aIso, bIso){
+  const a=new Date(aIso+'T00:00:00'), b=new Date(bIso+'T00:00:00');
+  return Math.round((b-a)/86400000);
+}
+// retorna info de reajuste ou null se não houver data de assinatura
+function infoReajuste(d){
+  const ass = String(d.dataAssinatura||'').slice(0,10);
+  if(!ass || ass.length<10) return null;
+  const h = hoje();
+  const [ay,am,ad] = ass.split('-').map(Number);
+  const hojeD = new Date(h+'T00:00:00');
+  // próximo aniversário da assinatura (>= hoje)
+  let prox = new Date(hojeD.getFullYear(), am-1, ad);
+  if(prox < hojeD) prox = new Date(hojeD.getFullYear()+1, am-1, ad);
+  const proxIso = prox.toISOString().slice(0,10);
+  const dias = diasEntre(h, proxIso);
+  const anos = prox.getFullYear() - ay;
+
+  // início do ciclo atual = aniversário imediatamente anterior a hoje
+  const inicioCiclo = new Date(prox); inicioCiclo.setFullYear(prox.getFullYear()-1);
+  const inicioCicloIso = inicioCiclo.toISOString().slice(0,10);
+
+  // se já houve reajuste a partir do início deste ciclo, está em dia (não avisa)
+  const ult = String(d.ultimoReajuste||'').slice(0,10);
+  const jaReajustado = !!ult && ult >= inicioCicloIso;
+
+  let estado = 'ok';
+  if(!jaReajustado){
+    if(dias <= DIAS_AVISO_REAJUSTE) estado = 'soon';      // aniversário chegando
+    const diasDesdeAniv = diasEntre(inicioCicloIso, h);
+    if(diasDesdeAniv >= 0 && diasDesdeAniv <= DIAS_AVISO_REAJUSTE) estado = 'due'; // aniversário recém-passado
+  }
+  return { proxIso, dias, anos, estado, jaReajustado, ultimoReajuste:ult };
+}
+
+function toast(msg, err){
+  const t=$('#toast'); t.textContent=msg; t.className='show'+(err?' err':'');
+  setTimeout(()=>t.className=t.className.replace('show',''),2800);
+}
+
+/* ---------- comunicação: planilha (online) ou navegador (local de teste) ---------- */
+const MODO_LOCAL = !API_URL;           // sem API_URL => salva no próprio navegador
+const LS_KEY = 'carteira_alugueis_local';
+
+let MEM_FALLBACK = null; // usado se localStorage estiver bloqueado
+function localLer(){
+  if(MEM_FALLBACK) return MEM_FALLBACK;
+  try{ return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); }
+  catch(e){ MEM_FALLBACK = MEM_FALLBACK || []; return MEM_FALLBACK; }
+}
+function localGravar(arr){
+  MEM_FALLBACK = arr;
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }catch(e){}
+}
+function localApi(action, p){
+  let arr = localLer();
+  if(action==='list'){
+    return { ok:true, data:arr };
+  }
+  if(action==='create'){
+    const id = 'L'+Date.now()+'-'+Math.floor(Math.random()*1000);
+    arr.push({
+      id, imovel:p.imovel||'', endereco:p.endereco||'', valor:Number(p.valor)||0,
+      vencimento:p.vencimento||'', recebido:false, dataRecebimento:'',
+      contaCorrente:p.contaCorrente||'', observacoes:p.observacoes||'',
+      dataAssinatura:p.dataAssinatura||'', vencimentoContrato:p.vencimentoContrato||'',
+      indiceCorrecao:p.indiceCorrecao||'', ultimoReajuste:'',
+      criadoEm:new Date().toISOString()
+    });
+    localGravar(arr);
+    return { ok:true, id };
+  }
+  const i = arr.findIndex(x=>String(x.id)===String(p.id));
+  if(i<0) return { ok:false, error:'Lançamento não encontrado' };
+  if(action==='update'){
+    ['imovel','endereco','valor','vencimento','contaCorrente','observacoes','dataAssinatura','vencimentoContrato','indiceCorrecao','contratoUrl','contratoId','ultimoReajuste'].forEach(k=>{
+      if(p[k]!==undefined) arr[i][k] = (k==='valor'? (Number(p[k])||0) : p[k]);
+    });
+    localGravar(arr); return { ok:true };
+  }
+  if(action==='toggle'){
+    arr[i].recebido = (p.recebido===true || p.recebido==='true');
+    if(p.dataRecebimento!==undefined) arr[i].dataRecebimento = p.dataRecebimento;
+    if(p.contaCorrente!==undefined) arr[i].contaCorrente = p.contaCorrente;
+    localGravar(arr); return { ok:true };
+  }
+  if(action==='delete'){
+    arr.splice(i,1); localGravar(arr); return { ok:true };
+  }
+  if(action==='reajustar'){
+    arr[i].ultimoReajuste = p.data || '';
+    if(p.novoValor!==undefined) arr[i].valor = Number(p.novoValor)||0;
+    localGravar(arr); return { ok:true };
+  }
+  return { ok:false, error:'Ação desconhecida' };
+}
+
+async function api(action, payload){
+  if(MODO_LOCAL){
+    // pequena espera para simular rede e manter a UX igual
+    return new Promise(res=>setTimeout(()=>res(localApi(action, payload||{})), 60));
+  }
+  const body = Object.assign({action}, payload||{});
+  const res = await fetch(API_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'}, // evita preflight CORS
+    body: JSON.stringify(body)
+  });
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error||'Erro desconhecido');
+  return json;
+}
+
+async function carregar(){
+  setLoading(true);
+  try{
+    const r = await api('list');
+    DADOS = r.data || [];
+    if(MODO_LOCAL){
+      $('#configWarn').style.display='block';
+      $('#status').innerHTML = '🧪 <b>Modo teste</b> (navegador) · '+DADOS.length+' lançamentos';
+    }else{
+      $('#status').innerHTML = 'Conectado · <b>'+DADOS.length+'</b> lançamentos';
+    }
+    renderTudo();
+  }catch(e){
+    $('#status').innerHTML='<b>Erro de conexão</b>';
+    toast('Erro ao carregar: '+e.message, true);
+  }finally{
+    setLoading(false);
+  }
+}
+function setLoading(on){
+  const el=$('#load-conferir'); if(el) el.classList.toggle('on',on);
+}
+
+/* ---------- abas ---------- */
+$$('nav.tabs button').forEach(b=>{
+  b.onclick=()=>{
+    $$('nav.tabs button').forEach(x=>x.classList.remove('active'));
+    $$('.panel').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    $('#tab-'+b.dataset.tab).classList.add('active');
+  };
+});
+
+/* ---------- render principal ---------- */
+function renderTudo(){
+  const pend = DADOS.filter(d=>!d.recebido);
+  const rec = DADOS.filter(d=>d.recebido);
+
+  $('#badge-conferir').textContent = pend.length;
+  $('#badge-recebidos').textContent = rec.length;
+
+  renderConferir(pend);
+  renderReajustes();
+  popularFiltros();
+  renderExtrato();
+}
+
+/* ===== A CONFERIR ===== */
+function renderConferir(pend){
+  const tb=$('#body-conferir'); tb.innerHTML='';
+  const totalPend = pend.reduce((s,d)=>s+d.valor,0);
+  $('#c-pend-total').textContent = BRLk(totalPend);
+  $('#c-pend-qtd').textContent = pend.length;
+  $('#c-vencidos').textContent = pend.filter(d=>isVencido(d.vencimento)).length;
+  $('#foot-conferir').textContent = BRL(totalPend);
+  $('#empty-conferir').style.display = pend.length? 'none':'block';
+
+  pend.sort((a,b)=>String(a.vencimento).localeCompare(String(b.vencimento)));
+  pend.forEach(d=>{
+    const tr=document.createElement('tr');
+    const venc = isVencido(d.vencimento)? '<span class="venc-late">'+fmtData(d.vencimento)+' ⚠</span>' : fmtData(d.vencimento);
+    tr.innerHTML = `
+      <td><button class="check-btn" title="Confirmar recebimento">✓</button></td>
+      <td class="imovel-cell"><b>${esc(d.imovel)}</b><span>${esc(d.endereco||'')}</span>${d.contratoUrl?'<br>'+clipContrato(d):''}</td>
+      <td class="valor num">${BRL(d.valor)}</td>
+      <td class="num">${venc}</td>
+      <td>${d.contaCorrente? '<span class="conta-pill">'+esc(d.contaCorrente)+'</span>':'—'}</td>
+      <td class="obs-cell">${esc(d.observacoes||'')}</td>
+      <td><div class="row-actions">
+        <button class="icon-btn" title="Editar">✎</button>
+        <button class="icon-btn danger" title="Excluir">🗑</button>
+      </div></td>`;
+    tr.querySelector('.check-btn').onclick=()=>confirmarRecebimento(d);
+    tr.querySelector('.icon-btn[title="Editar"]').onclick=()=>editar(d.id);
+    tr.querySelector('.icon-btn.danger').onclick=()=>excluir(d.id);
+    tb.appendChild(tr);
+  });
+}
+
+/* ===== REAJUSTES ===== */
+function renderReajustes(){
+  const lista = [];
+  DADOS.forEach(d=>{
+    const info = infoReajuste(d);
+    if(info) lista.push({d, info});
+  });
+  // ordena: due e soon primeiro, depois por proximidade
+  const ordem={due:0, soon:1, ok:2};
+  lista.sort((a,b)=> (ordem[a.info.estado]-ordem[b.info.estado]) || (a.info.dias-b.info.dias));
+
+  const alertas = lista.filter(x=>x.info.estado==='due'||x.info.estado==='soon');
+  $('#badge-reajustes').textContent = alertas.length;
+  $('#rj-prox').textContent = lista.filter(x=>x.info.estado==='soon').length;
+  $('#rj-venc').textContent = lista.filter(x=>x.info.estado==='due').length;
+  $('#rj-total').textContent = lista.length;
+
+  // banner na aba A conferir
+  const banner=$('#rj-banner');
+  if(alertas.length){
+    const nomes = alertas.slice(0,3).map(x=>x.d.imovel).join(', ');
+    banner.style.display='block';
+    banner.innerHTML = `🔔 <b>${alertas.length} contrato(s)</b> com reajuste a aplicar (${esc(nomes)}${alertas.length>3?'…':''}). Clique para ver na aba <b>Reajustes</b>.`;
+    banner.onclick=()=>document.querySelector('nav.tabs button[data-tab="reajustes"]').click();
+  }else{
+    banner.style.display='none';
+  }
+
+  const tb=$('#body-reajustes'); tb.innerHTML='';
+  $('#empty-reajustes').style.display = lista.length? 'none':'block';
+
+  lista.forEach(({d,info})=>{
+    let pill, txt;
+    if(info.jaReajustado){ pill='pill-ok'; txt=`Reajustado · próx. ${fmtData(info.proxIso)}`; }
+    else if(info.estado==='due'){ pill='pill-due'; txt=`Reajustar agora (${info.anos}º ano)`; }
+    else if(info.estado==='soon'){ pill='pill-soon'; txt=`Em ${info.dias} dia(s) (${info.anos}º ano)`; }
+    else { pill='pill-ok'; txt=`Faltam ${info.dias} dias`; }
+
+    const podeReajustar = (info.estado==='due'||info.estado==='soon') && !info.jaReajustado;
+
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td class="imovel-cell"><b>${esc(d.imovel)}</b><span>${esc(d.endereco||'')}</span>${d.contratoUrl?'<br>'+clipContrato(d):''}</td>
+      <td class="valor num">${BRL(d.valor)}</td>
+      <td>${d.indiceCorrecao? '<span class="conta-pill">'+esc(d.indiceCorrecao)+'</span>':'—'}</td>
+      <td class="num">${fmtData(d.dataAssinatura)}</td>
+      <td class="num">${fmtData(info.proxIso)}</td>
+      <td class="num">${info.ultimoReajuste? fmtData(info.ultimoReajuste):'—'}</td>
+      <td><span class="pill-alert ${pill}">${txt}</span></td>
+      <td><div class="row-actions">
+        ${podeReajustar? '<button class="check-btn" title="Marcar reajuste como aplicado">✓</button>':''}
+        ${info.jaReajustado? '<button class="icon-btn" title="Desfazer reajuste">↩</button>':''}
+        <button class="icon-btn" title="Editar">✎</button>
+      </div></td>`;
+    const chk=tr.querySelector('.check-btn');
+    if(chk) chk.onclick=()=>marcarReajuste(d);
+    const undo=tr.querySelector('[title="Desfazer reajuste"]');
+    if(undo) undo.onclick=()=>desfazerReajuste(d);
+    tr.querySelector('[title="Editar"]').onclick=()=>editar(d.id);
+    tb.appendChild(tr);
+  });
+}
+
+/* ===== confirmar / desfazer ===== */
+async function confirmarRecebimento(d){
+  let conta = d.contaCorrente || '';
+  const dataRec = prompt('Data em que o aluguel caiu no banco (AAAA-MM-DD):', hoje());
+  if(dataRec===null) return;
+  if(!conta){
+    conta = prompt('Em qual conta corrente caiu o aluguel?', '') || '';
+  } else {
+    const c = prompt('Conta corrente em que caiu (confirme ou ajuste):', conta);
+    if(c!==null) conta = c;
+  }
+  try{
+    await api('toggle', {id:d.id, recebido:true, dataRecebimento:dataRec, contaCorrente:conta});
+    d.recebido=true; d.dataRecebimento=dataRec; d.contaCorrente=conta;
+    toast('Aluguel confirmado ✓ movido para Recebidos');
+    renderTudo();
+  }catch(e){ toast('Erro: '+e.message, true); }
+}
+async function desfazerRecebimento(d){
+  if(!confirm('Voltar este lançamento para "A conferir"?')) return;
+  try{
+    await api('toggle', {id:d.id, recebido:false, dataRecebimento:''});
+    d.recebido=false; d.dataRecebimento='';
+    toast('Voltou para "A conferir"');
+    renderTudo();
+  }catch(e){ toast('Erro: '+e.message, true); }
+}
+
+/* ===== marcar / desfazer reajuste ===== */
+async function marcarReajuste(d){
+  const data = prompt('Data em que o reajuste foi aplicado (AAAA-MM-DD):', hoje());
+  if(data===null) return;
+  const novo = prompt(`Novo valor do aluguel (atual: ${BRL(d.valor)}).\nDeixe em branco para manter o valor atual:`, '');
+  if(novo===null) return; // cancelou
+  const novoValor = novo.trim()==='' ? undefined : parseFloat(novo.replace(',','.'));
+  if(novo.trim()!=='' && !(novoValor>0)){ toast('Valor inválido', true); return; }
+  try{
+    await api('reajustar', Object.assign({id:d.id, data}, novoValor!==undefined?{novoValor}:{}));
+    d.ultimoReajuste = data;
+    if(novoValor!==undefined) d.valor = novoValor;
+    toast('Reajuste registrado ✓ saiu da lista de avisos');
+    renderTudo();
+  }catch(e){ toast('Erro: '+e.message, true); }
+}
+async function desfazerReajuste(d){
+  if(!confirm('Desfazer o registro de reajuste deste contrato? (o valor do aluguel não muda)')) return;
+  try{
+    await api('reajustar', {id:d.id, data:''});
+    d.ultimoReajuste='';
+    toast('Registro de reajuste desfeito');
+    renderTudo();
+  }catch(e){ toast('Erro: '+e.message, true); }
+}
+
+/* ===== EXTRATO + filtros ===== */
+function popularFiltros(){
+  const selImovel=$('#f-imovel'), selConta=$('#f-conta');
+  const imAtual=selImovel.value, ctAtual=selConta.value;
+  const imoveis=[...new Set(DADOS.map(d=>d.imovel).filter(Boolean))].sort();
+  const contas=[...new Set(DADOS.map(d=>d.contaCorrente).filter(Boolean))].sort();
+  selImovel.innerHTML='<option value="">Todos</option>'+imoveis.map(i=>`<option>${esc(i)}</option>`).join('');
+  selConta.innerHTML='<option value="">Todas</option>'+contas.map(c=>`<option>${esc(c)}</option>`).join('');
+  selImovel.value=imAtual; selConta.value=ctAtual;
+}
+function renderExtrato(){
+  const de=$('#f-de').value, ate=$('#f-ate').value;
+  const imovel=$('#f-imovel').value, conta=$('#f-conta').value, sit=$('#f-situacao').value;
+  let lista=DADOS.slice();
+
+  if(sit==='recebido') lista=lista.filter(d=>d.recebido);
+  else if(sit==='pendente') lista=lista.filter(d=>!d.recebido);
+
+  if(imovel) lista=lista.filter(d=>d.imovel===imovel);
+  if(conta) lista=lista.filter(d=>d.contaCorrente===conta);
+  if(de) lista=lista.filter(d=>{const dt=String(d.dataRecebimento||d.vencimento).slice(0,10); return dt>=de;});
+  if(ate) lista=lista.filter(d=>{const dt=String(d.dataRecebimento||d.vencimento).slice(0,10); return dt<=ate;});
+
+  lista.sort((a,b)=>String(b.dataRecebimento||b.vencimento).localeCompare(String(a.dataRecebimento||a.vencimento)));
+
+  const tb=$('#body-extrato'); tb.innerHTML='';
+  const total=lista.reduce((s,d)=>s+d.valor,0);
+  const mesAtual=hoje().slice(0,7);
+  const noMes=lista.filter(d=>d.recebido && String(d.dataRecebimento).slice(0,7)===mesAtual).reduce((s,d)=>s+d.valor,0);
+  $('#x-total').textContent=BRLk(total);
+  $('#x-qtd').textContent=lista.length;
+  $('#x-mes').textContent=BRLk(noMes);
+  $('#foot-extrato').textContent=BRL(total);
+  $('#empty-extrato').style.display=lista.length?'none':'block';
+
+  lista.forEach(d=>{
+    const tr=document.createElement('tr');
+    const badge = d.recebido
+      ? '<span class="conta-pill" style="border-color:var(--green);color:var(--green)">Recebido</span>'
+      : '<span class="conta-pill" style="border-color:var(--gold);color:var(--gold)">Pendente</span>';
+    tr.innerHTML=`
+      <td class="num">${d.recebido? fmtData(d.dataRecebimento):'—'}</td>
+      <td class="num">${fmtData(d.vencimento)}</td>
+      <td class="valor num">${BRL(d.valor)}</td>
+      <td class="imovel-cell"><b>${esc(d.imovel)}</b><span>${esc(d.endereco||'')}</span>${d.contratoUrl?'<br>'+clipContrato(d):''}</td>
+      <td>${d.contaCorrente? '<span class="conta-pill">'+esc(d.contaCorrente)+'</span>':'—'}</td>
+      <td>${badge}</td>
+      <td class="obs-cell">${esc(d.observacoes||'')}</td>
+      <td><div class="row-actions">
+        ${d.recebido? '<button class="icon-btn" title="Desfazer (voltar p/ a conferir)">↩</button>':''}
+        <button class="icon-btn" title="Editar">✎</button>
+        <button class="icon-btn danger" title="Excluir">🗑</button>
+      </div></td>`;
+    const undo=tr.querySelector('[title^="Desfazer"]');
+    if(undo) undo.onclick=()=>desfazerRecebimento(d);
+    tr.querySelector('[title="Editar"]').onclick=()=>editar(d.id);
+    tr.querySelector('.icon-btn.danger').onclick=()=>excluir(d.id);
+    tb.appendChild(tr);
+  });
+}
+['f-de','f-ate','f-imovel','f-conta','f-situacao'].forEach(id=>{
+  $('#'+id).addEventListener('change', renderExtrato);
+});
+$('#f-limpar').onclick=()=>{
+  ['f-de','f-ate'].forEach(id=>$('#'+id).value='');
+  $('#f-imovel').value=''; $('#f-conta').value=''; $('#f-situacao').value='recebido';
+  renderExtrato();
+};
+
+/* ===== FORM novo/editar ===== */
+$('#btn-salvar').onclick=salvar;
+$('#btn-cancelar').onclick=cancelarEdicao;
+
+async function salvar(){
+  const imovel=$('#i-imovel').value.trim();
+  const valor=parseFloat($('#i-valor').value);
+  const vencimento=$('#i-vencimento').value;
+  if(!imovel){ toast('Informe o imóvel/inquilino', true); return; }
+  if(!(valor>0)){ toast('Informe um valor válido', true); return; }
+  if(!vencimento){ toast('Informe a data de vencimento', true); return; }
+
+  const payload={
+    imovel, valor, vencimento,
+    endereco:$('#i-endereco').value.trim(),
+    contaCorrente:$('#i-conta').value.trim(),
+    observacoes:$('#i-obs').value.trim(),
+    dataAssinatura:$('#i-assinatura').value,
+    vencimentoContrato:$('#i-venc-contrato').value,
+    indiceCorrecao:$('#i-indice').value
+  };
+  const btn=$('#btn-salvar'); btn.disabled=true; btn.textContent='Salvando…';
+  try{
+    let alvoId;
+    if(editandoId){
+      await api('update', Object.assign({id:editandoId}, payload));
+      const d=DADOS.find(x=>x.id===editandoId); Object.assign(d, payload);
+      alvoId = editandoId;
+      toast('Lançamento atualizado');
+    }else{
+      const r=await api('create', payload);
+      DADOS.push(Object.assign({id:r.id, recebido:false, dataRecebimento:'', contratoUrl:'', contratoId:''}, payload));
+      alvoId = r.id;
+      toast('Lançamento salvo ✓');
+    }
+    // se houver arquivo selecionado, envia agora
+    const arq = $('#i-contrato').files[0];
+    if(arq){
+      btn.textContent='Enviando contrato…';
+      await enviarContrato(alvoId, arq);
+    }
+    limparForm();
+    renderTudo();
+    document.querySelector('nav.tabs button[data-tab="conferir"]').click();
+  }catch(e){ toast('Erro: '+e.message, true); }
+  finally{ btn.disabled=false; btn.textContent='Salvar lançamento'; }
+}
+
+/* ===== Anexo de contrato ===== */
+function lerArquivoBase64(file){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onload=()=>res(String(fr.result).split(',')[1]); // remove "data:...;base64,"
+    fr.onerror=()=>rej(new Error('Falha ao ler o arquivo'));
+    fr.readAsDataURL(file);
+  });
+}
+async function enviarContrato(id, file){
+  if(file.size > 25*1024*1024){ toast('Arquivo muito grande (máx. 25 MB)', true); return; }
+  if(MODO_LOCAL){
+    // no modo teste guardamos só o nome (sem Drive); link real só com a API configurada
+    const d=DADOS.find(x=>x.id===id);
+    if(d){ d.contratoUrl='#'; d.contratoId='local'; d.contratoNome=file.name; }
+    await api('update', {id, contratoUrl:'#', contratoId:'local'});
+    toast('🧪 Modo teste: contrato registrado (sem Drive)');
+    return;
+  }
+  const fileData = await lerArquivoBase64(file);
+  const r = await api('uploadContrato', {
+    id, fileName:file.name, mimeType:file.type||'application/octet-stream', fileData
+  });
+  const d=DADOS.find(x=>x.id===id);
+  if(d){ d.contratoUrl=r.contratoUrl; d.contratoId=r.contratoId; }
+  toast('Contrato salvo no Drive ✓');
+}
+async function removerContratoDe(id){
+  if(!confirm('Remover o contrato anexado? O arquivo irá para a lixeira do Drive.')) return;
+  try{
+    if(!MODO_LOCAL) await api('removeContrato', {id});
+    else await api('update', {id, contratoUrl:'', contratoId:''});
+    const d=DADOS.find(x=>x.id===id);
+    if(d){ d.contratoUrl=''; d.contratoId=''; d.contratoNome=''; }
+    toast('Contrato removido');
+    // se estiver editando este, atualiza o painel
+    if(editandoId===id) refletirAnexo(d);
+    renderTudo();
+  }catch(e){ toast('Erro: '+e.message, true); }
+}
+function refletirAnexo(d){
+  const atual=$('#anexo-atual'), link=$('#anexo-link');
+  if(d && d.contratoUrl){
+    atual.style.display='flex';
+    if(d.contratoUrl==='#'){ link.textContent='(modo teste — sem link)'; link.removeAttribute('href'); }
+    else { link.textContent='Abrir contrato'; link.href=d.contratoUrl; }
+    $('#anexo-hint').textContent='Para trocar, selecione outro arquivo abaixo.';
+  }else{
+    atual.style.display='none';
+    $('#anexo-hint').textContent='PDF ou foto (JPG/PNG). Será salvo no seu Google Drive. Máx. ~25 MB.';
+  }
+  $('#i-contrato').value='';
+}
+$('#anexo-remover').onclick=()=>{ if(editandoId) removerContratoDe(editandoId); };
+function editar(id){
+  const d=DADOS.find(x=>x.id===id); if(!d) return;
+  editandoId=id;
+  $('#form-title').textContent='Editar lançamento';
+  $('#i-imovel').value=d.imovel||''; $('#i-endereco').value=d.endereco||'';
+  $('#i-valor').value=d.valor||''; $('#i-vencimento').value=String(d.vencimento||'').slice(0,10);
+  $('#i-conta').value=d.contaCorrente||''; $('#i-obs').value=d.observacoes||'';
+  $('#i-assinatura').value=String(d.dataAssinatura||'').slice(0,10);
+  $('#i-venc-contrato').value=String(d.vencimentoContrato||'').slice(0,10);
+  $('#i-indice').value=d.indiceCorrecao||'';
+  refletirAnexo(d);
+  $('#btn-cancelar').style.display='inline-block';
+  document.querySelector('nav.tabs button[data-tab="imoveis"]').click();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function cancelarEdicao(){ limparForm(); toast('Edição cancelada'); }
+function limparForm(){
+  editandoId=null;
+  $('#form-title').textContent='Novo lançamento de aluguel';
+  ['i-imovel','i-endereco','i-valor','i-vencimento','i-conta','i-obs','i-assinatura','i-venc-contrato','i-indice'].forEach(id=>$('#'+id).value='');
+  refletirAnexo(null);
+  $('#btn-cancelar').style.display='none';
+}
+async function excluir(id){
+  if(!confirm('Excluir este lançamento definitivamente?')) return;
+  try{
+    await api('delete', {id});
+    DADOS=DADOS.filter(d=>d.id!==id);
+    toast('Lançamento excluído');
+    renderTudo();
+  }catch(e){ toast('Erro: '+e.message, true); }
+}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function clipContrato(d){
+  if(!d.contratoUrl) return '';
+  if(d.contratoUrl==='#') return '<span class="clip-link" title="Anexado (modo teste)">📎 contrato</span>';
+  return '<a class="clip-link" href="'+esc(d.contratoUrl)+'" target="_blank" rel="noopener" title="Abrir contrato">📎 contrato</a>';
+}
+
+/* ===== botão de exemplos (só no modo teste) ===== */
+async function inserirExemplos(){
+  const d = new Date();
+  const ano = d.getFullYear(), mes = String(d.getMonth()+1).padStart(2,'0');
+  // datas de assinatura: uma com aniversário em ~20 dias (dispara aviso), as outras distantes
+  const em20 = new Date(d.getTime()+20*86400000);
+  const assinProx = `${ano-1}-${String(em20.getMonth()+1).padStart(2,'0')}-${String(em20.getDate()).padStart(2,'0')}`;
+  const exemplos = [
+    {imovel:'Apto 302 — João Silva', endereco:'Rua das Flores, 120, Centro, Maringá-PR', valor:1500, vencimento:`${ano}-${mes}-05`, contaCorrente:'Itaú Ag 1234 C/C 56789', observacoes:'Contrato até dez/2026', dataAssinatura:assinProx, vencimentoContrato:`${ano+1}-12-31`, indiceCorrecao:'IGP-M'},
+    {imovel:'Casa 7 — Maria Souza', endereco:'Av. Brasil, 980, Zona 7, Maringá-PR', valor:2200, vencimento:`${ano}-${mes}-10`, contaCorrente:'Bradesco Ag 5678 C/C 11223', observacoes:'IPTU por conta do inquilino', dataAssinatura:`${ano-1}-09-15`, vencimentoContrato:`${ano+1}-09-14`, indiceCorrecao:'IPCA'},
+    {imovel:'Sala comercial 12', endereco:'Ed. Centro Empresarial, sala 12, Londrina-PR', valor:1800, vencimento:`${ano}-${mes}-15`, contaCorrente:'Itaú Ag 1234 C/C 56789', observacoes:'', dataAssinatura:'', vencimentoContrato:'', indiceCorrecao:''}
+  ];
+  for(const ex of exemplos){
+    const r = await api('create', ex);
+    DADOS.push(Object.assign({id:r.id, recebido:false, dataRecebimento:''}, ex));
+  }
+  toast('3 lançamentos de exemplo inseridos');
+  renderTudo();
+}
+const seedBtn = $('#seedBtn');
+if(seedBtn) seedBtn.onclick=(e)=>{ e.preventDefault(); inserirExemplos(); };
+
+/* ===== EXPORTAÇÃO (Excel / PDF) ===== */
+function dadosConferir(){
+  return DADOS.filter(d=>!d.recebido)
+    .sort((a,b)=>String(a.vencimento).localeCompare(String(b.vencimento)));
+}
+function dadosExtratoFiltrado(){
+  const de=$('#f-de').value, ate=$('#f-ate').value;
+  const imovel=$('#f-imovel').value, conta=$('#f-conta').value, sit=$('#f-situacao').value;
+  let lista=DADOS.slice();
+  if(sit==='recebido') lista=lista.filter(d=>d.recebido);
+  else if(sit==='pendente') lista=lista.filter(d=>!d.recebido);
+  if(imovel) lista=lista.filter(d=>d.imovel===imovel);
+  if(conta) lista=lista.filter(d=>d.contaCorrente===conta);
+  if(de) lista=lista.filter(d=>String(d.dataRecebimento||d.vencimento).slice(0,10)>=de);
+  if(ate) lista=lista.filter(d=>String(d.dataRecebimento||d.vencimento).slice(0,10)<=ate);
+  return lista.sort((a,b)=>String(b.dataRecebimento||b.vencimento).localeCompare(String(a.dataRecebimento||a.vencimento)));
+}
+function carimboData(){ return new Date().toISOString().slice(0,10); }
+
+function exportarExcel(tipo){
+  if(typeof XLSX==='undefined'){ toast('Biblioteca de Excel ainda carregando, tente de novo', true); return; }
+  const conferir = tipo==='conferir';
+  const lista = conferir? dadosConferir() : dadosExtratoFiltrado();
+  if(!lista.length){ toast('Nada para exportar', true); return; }
+
+  const linhas = lista.map(d=>{
+    const base = {
+      'Imóvel / Inquilino': d.imovel||'',
+      'Endereço': d.endereco||'',
+      'Valor (R$)': Number(d.valor)||0,
+      'Vencimento': fmtData(d.vencimento),
+      'Conta corrente': d.contaCorrente||'',
+      'Assinatura contrato': fmtData(d.dataAssinatura),
+      'Vencimento contrato': fmtData(d.vencimentoContrato),
+      'Índice': d.indiceCorrecao||'',
+      'Observações': d.observacoes||''
+    };
+    if(!conferir){
+      return Object.assign({
+        'Situação': d.recebido?'Recebido':'Pendente',
+        'Recebido em': d.recebido? fmtData(d.dataRecebimento):''
+      }, base);
+    }
+    return base;
+  });
+  const total = lista.reduce((s,d)=>s+(Number(d.valor)||0),0);
+  linhas.push({});
+  linhas.push({ [conferir?'Imóvel / Inquilino':'Situação']:'TOTAL', 'Valor (R$)': total });
+
+  const ws = XLSX.utils.json_to_sheet(linhas);
+  // largura de colunas
+  const cols = Object.keys(linhas[0]||{}).map(k=>({wch: k==='Observações'?40:(k==='Endereço'?32:18)}));
+  ws['!cols']=cols;
+  const wb = XLSX.utils.book_new();
+  const nomeAba = conferir? 'A conferir':'Histórico';
+  XLSX.utils.book_append_sheet(wb, ws, nomeAba);
+  XLSX.writeFile(wb, `carteira-alugueis-${conferir?'a-conferir':'historico'}-${carimboData()}.xlsx`);
+  toast('Excel exportado ✓');
+}
+
+function exportarPDF(tipo){
+  const jspdfNS = window.jspdf || {};
+  const JsPDF = jspdfNS.jsPDF;
+  if(!JsPDF){ toast('Biblioteca de PDF ainda carregando, tente de novo', true); return; }
+  const conferir = tipo==='conferir';
+  const lista = conferir? dadosConferir() : dadosExtratoFiltrado();
+  if(!lista.length){ toast('Nada para exportar', true); return; }
+
+  const doc = new JsPDF({orientation:'landscape', unit:'pt', format:'a4'});
+  const titulo = conferir? 'Aluguéis a conferir' : 'Histórico de aluguéis (extrato)';
+  doc.setFontSize(15); doc.setTextColor(21,77,53);
+  doc.text(titulo, 40, 38);
+  doc.setFontSize(9); doc.setTextColor(90);
+  doc.text('Carteira de Aluguéis · gerado em '+fmtData(carimboData()), 40, 54);
+
+  let head, body;
+  if(conferir){
+    head=[['Imóvel / Inquilino','Endereço','Valor','Vencimento','Conta corrente','Observações']];
+    body=lista.map(d=>[d.imovel||'', d.endereco||'', BRL(d.valor), fmtData(d.vencimento), d.contaCorrente||'', d.observacoes||'']);
+  }else{
+    head=[['Recebido em','Vencimento','Valor','Imóvel / Inquilino','Conta corrente','Situação','Obs.']];
+    body=lista.map(d=>[d.recebido?fmtData(d.dataRecebimento):'—', fmtData(d.vencimento), BRL(d.valor), d.imovel||'', d.contaCorrente||'', d.recebido?'Recebido':'Pendente', d.observacoes||'']);
+  }
+  const total = lista.reduce((s,d)=>s+(Number(d.valor)||0),0);
+
+  doc.autoTable({
+    head, body, startY:66, theme:'striped',
+    styles:{fontSize:8, cellPadding:4, overflow:'linebreak'},
+    headStyles:{fillColor:[31,107,74], textColor:255},
+    alternateRowStyles:{fillColor:[243,241,233]},
+    foot:[ conferir
+      ? [{content:'TOTAL', colSpan:2, styles:{halign:'right',fontStyle:'bold'}}, {content:BRL(total), styles:{fontStyle:'bold'}}, '', '', '']
+      : [{content:'TOTAL', colSpan:2, styles:{halign:'right',fontStyle:'bold'}}, {content:BRL(total), styles:{fontStyle:'bold'}}, '', '', '', '']
+    ],
+    footStyles:{fillColor:[233,230,219], textColor:[21,77,53]}
+  });
+  doc.save(`carteira-alugueis-${conferir?'a-conferir':'historico'}-${carimboData()}.pdf`);
+  toast('PDF exportado ✓');
+}
+
+(function ligarExport(){
+  const map = {
+    'exp-conferir-xls':()=>exportarExcel('conferir'),
+    'exp-conferir-pdf':()=>exportarPDF('conferir'),
+    'exp-extrato-xls':()=>exportarExcel('extrato'),
+    'exp-extrato-pdf':()=>exportarPDF('extrato')
+  };
+  Object.entries(map).forEach(([id,fn])=>{ const el=$('#'+id); if(el) el.onclick=fn; });
+})();
+
+/* start */
+carregar();
+</script>
+</body>
+</html>
